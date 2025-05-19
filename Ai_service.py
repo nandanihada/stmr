@@ -29,6 +29,10 @@ except Exception as e:
     print(f"Firebase initialization error: {e}")
     db = None
 
+@app.route('/')
+def index():
+    return "Welcome to Survey AI Backend!"
+
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
@@ -461,4 +465,4 @@ def get_survey_tracking(survey_id):
 
 if __name__ == '__main__':
      port = int(os.environ.get("PORT", 5000))  # Render ka PORT environment variable ya 5000 default
-     app.run(host="0.0.0.0", port=port, debug=True)
+     app.run(host="0.0.0.0", port=port)
