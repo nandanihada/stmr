@@ -34,6 +34,28 @@ def index():
     return "Welcome to Survey AI Backend!"
 
 
+@app.route('/save-email', methods=['POST'])
+def save_email():
+    data = request.json
+    email = data.get('email')
+
+    if not email:
+        return jsonify({"error": "Email is required"}), 400
+
+    try:
+        # Create a new document in "user_emails" collection with a unique ID
+        doc_id = str(uuid.uuid4())
+        email_data = {
+            "email": email,
+            "saved_at": firestore.SERVER_TIMESTAMP
+        }
+        db.collection("user_emails").document(doc_id).set(email_data)
+
+        return jsonify({"message": "Email saved successfully", "id": doc_id})
+    except Exception as e:
+        print(f"Error saving email: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/webhook', methods=['POST'])
 def webhook():
     data = request.json
