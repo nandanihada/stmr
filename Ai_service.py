@@ -8,6 +8,8 @@ import json
 import re
 from datetime import datetime
 import threading
+import os, json
+from firebase_admin import credentials
 
 app = Flask(__name__)
 CORS(app)
@@ -18,7 +20,8 @@ model = genai.GenerativeModel("gemini-1.5-flash-latest")
 
 # Firebase Setup
 try:
-    cred = credentials.Certificate("firebase_key.json")
+    cred_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    cred = credentials.Certificate(json.loads(cred_json))
     firebase_admin.initialize_app(cred)
     db = firestore.client()
     print("Firebase connected successfully")
