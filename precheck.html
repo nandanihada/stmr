@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pre-Survey Check</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .fade-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+    }
+    .fade-overlay.active {
+      display: flex;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="p-5">
+
+  <h3>Quick Pre-Survey</h3>
+  <form id="preSurveyForm">
+    <div class="mb-3">
+      <label>Do you want to start a business?</label>
+      <select class="form-select" name="q1">
+        <option value="">Select</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label>Are you currently in college?</label>
+      <select class="form-select" name="q2">
+        <option value="">Select</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+
+  <div id="redirectSpinner" class="fade-overlay">
+    <div>
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;"></div>
+      <p class="mt-3 text-center text-primary">Redirecting...</p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("preSurveyForm");
+
+    form.onsubmit = async function(e) {
+      e.preventDefault();
+
+      const q1 = form.q1.value;
+      const q2 = form.q2.value;
+
+      if (!q1 || !q2) {
+        alert("Please answer all questions");
+        return;
+      }
+
+      const spinner = document.getElementById("redirectSpinner");
+      spinner.classList.add("active");
+
+      try {
+        const res = await fetch("http://localhost:5000/check-logic", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            survey_id: "abc123", // dummy id if needed
+            responses: {
+              "Do you want to start a business?": q1,
+              "Are you currently in college?": q2
+            }
+          })
+        });
+
+        const data = await res.json();
+        setTimeout(() => {
+          window.location.href = data.next_page;
+        }, 2000);
+
+      } catch (err) {
+        console.error(err);
+        spinner.classList.remove("active");
+        alert("Something went wrong.");
+      }
+    };
+  </script>
+
+</body>
+</html>
