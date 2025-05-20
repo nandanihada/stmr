@@ -11,6 +11,10 @@ import threading
 import os, json
 from firebase_admin import credentials
 
+
+BASE_URL = "https://pepperadsresponses.web.app"
+
+
 app = Flask(__name__)
 CORS(app)
 
@@ -145,12 +149,12 @@ def generate_survey():
 
         # Prepare survey data for Firestore
         survey_data = {
-            "id": survey_id,
-            "prompt": prompt,
-            "response_type": response_type,
-            "questions": questions,
-            "created_at": firestore.SERVER_TIMESTAMP,
-            "shareable_link": f"/survey/{survey_id}/respond"
+             "id": survey_id,
+    "prompt": prompt,
+    "response_type": response_type,
+    "questions": questions,
+    "created_at": firestore.SERVER_TIMESTAMP,
+    "shareable_link": f"{BASE_URL}/survey/{survey_id}/respond"
         }
 
         # Save survey to Firestore
