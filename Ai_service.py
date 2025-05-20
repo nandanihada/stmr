@@ -176,6 +176,8 @@ def submit_response():
     survey_id = data.get("survey_id")
     responses = data.get("responses")
     tracking_id = data.get("tracking_id")
+    email = data.get("email")
+    username = data.get("username")
 
     if not survey_id or not responses:
         return jsonify({"error": "Survey ID and responses required"}), 400
@@ -196,7 +198,8 @@ def submit_response():
             "responses": responses,
             "submitted_at": firestore.SERVER_TIMESTAMP
         }
-
+        if email:
+            response_data["email"] = email
         # Save to survey_responses collection
         db.collection("survey_responses").document(response_id).set(response_data)
 
@@ -351,6 +354,10 @@ def submit_public_response(survey_id):
     data = request.json
     responses = data.get("responses")
     tracking_id = data.get("tracking_id")
+    email = data.get("email")
+    username = data.get("username")
+
+
 
     if not responses:
         return jsonify({"error": "Responses required"}), 400
@@ -370,6 +377,8 @@ def submit_public_response(survey_id):
             "submitted_at": firestore.SERVER_TIMESTAMP,
             "is_public": True  # Mark as public response
         }
+        if email:
+            response_data["email"] = email 
 
         db.collection("survey_responses").document(response_id).set(response_data)
 

@@ -44,6 +44,16 @@
     <h2 id="surveyTitle" class="mb-4">Survey</h2>
 
     <form id="surveyResponseForm">
+      <div class="mb-3">
+        <label for="username" class="form-label">Your Name (optional)</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="John Doe">
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Your Email (optional)</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="you@example.com">
+      </div>
+      
       <div id="questionContainer"></div>
       <button type="submit" class="btn btn-primary w-100 mt-3">Submit Responses</button>
     </form>
@@ -74,6 +84,9 @@
     const thankYouMessage = document.getElementById('thankYouMessage');
     const viewResultsLink = document.getElementById('viewResultsLink');
     const loadingOverlay = document.getElementById('loadingOverlay');
+    const emailInput = document.getElementById('email');
+    const email = emailInput ? emailInput.value : null;
+
     
     // Store tracking ID
     let trackingId = null;
@@ -98,7 +111,9 @@
         const response = await fetch(`${SERVER_URL}/track/survey/open`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ survey_id: surveyId })
+          body: JSON.stringify({ survey_id: surveyId, responses,
+  tracking_id: trackingId,
+  email: email || undefined ,username: username || undefined })
         });
         
         const data = await response.json();
@@ -181,6 +196,11 @@
     }
 
     surveyResponseForm.addEventListener('submit', async (e) => {
+      const emailInput = document.getElementById('email');
+const usernameInput = document.getElementById('username');
+const email = emailInput ? emailInput.value : null;
+const username = usernameInput ? usernameInput.value : null;
+
       e.preventDefault();
 
       const responses = {};
