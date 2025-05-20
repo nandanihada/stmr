@@ -69,7 +69,7 @@
       spinner.classList.add("active");
 
       try {
-        const res = await fetch("http://localhost:5000/check-logic", {
+        const res = await fetch("https://survey-ai-033z.onrender.com/check-logic", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -318,7 +318,7 @@
                 renderSurveyPreview(data.questions);
                 
                 // Update shareable link
-                surveyShareLink.value = `http://127.0.0.1:5500/public_survey.html?id=${currentSurveyId}`;
+                surveyShareLink.value = `https://pepperadsresponses.web.app/public_survey.html?id=${currentSurveyId}`;
             } catch (error) {
                 displayErrorToast(`Survey Generation Failed: ${error.message}`);
                 console.error(error);
