@@ -265,8 +265,7 @@ def get_survey(survey_id):
                 "submitted": False,
                 "user_agent": request.headers.get('User-Agent', 'Unknown'),
                 "ip_address": request.remote_addr,
-                "email": data.get("email"),
-                "username": data.get("username")
+               
                             }
 
             # Store tracking data
@@ -319,26 +318,25 @@ def view_survey(survey_id):
 def track_survey_open():
     data = request.json
     survey_id = data.get("survey_id")
-    email = data.get("email")
-    username = data.get("username")
 
     if not survey_id:
         return jsonify({"error": "Survey ID is required"}), 400
 
     try:
+        # Generate a tracking ID
         tracking_id = str(uuid.uuid4())
 
+        # Create tracking document in Firestore
         tracking_data = {
             "survey_id": survey_id,
             "tracking_id": tracking_id,
             "opened_at": firestore.SERVER_TIMESTAMP,
             "submitted": False,
             "user_agent": request.headers.get('User-Agent', 'Unknown'),
-            "ip_address": request.remote_addr,
-            "email": email,
-            "username": username
+            "ip_address": request.remote_addr
         }
 
+        # Store tracking data
         db.collection("survey_tracking").document(tracking_id).set(tracking_data)
 
         return jsonify({
@@ -349,7 +347,6 @@ def track_survey_open():
     except Exception as e:
         print(f"Survey tracking error: {e}")
         return jsonify({"error": str(e)}), 500
-
 
 
 # Add this new route for public response submission
