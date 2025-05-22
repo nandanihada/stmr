@@ -317,8 +317,17 @@
                 currentSurveyData = data.questions;
                 renderSurveyPreview(data.questions);
                 
-                // Update shareable link
-                surveyShareLink.value = `https://pepperadsresponses.web.app/public_survey.html?id=${currentSurveyId}`;
+                const username = localStorage.getItem('username');  // Or however you're storing the logged-in user
+const email = localStorage.getItem('email');
+
+const queryParams = new URLSearchParams({
+  id: currentSurveyId,
+  username: username || '',
+  email: email || ''
+});
+
+surveyShareLink.value = `https://pepperadsresponses.web.app/public_survey.html?${queryParams.toString()}`;
+
             } catch (error) {
                 displayErrorToast(`Survey Generation Failed: ${error.message}`);
                 console.error(error);
