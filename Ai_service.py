@@ -9,6 +9,8 @@ import re
 from datetime import datetime
 import threading
 import os
+from integrations import forward_survey_data_to_partners
+
 
 BASE_URL = "https://pepperadsresponses.web.app"
 
@@ -157,6 +159,10 @@ def submit_response():
             response_data["username"] = username
 
         db.collection("survey_responses").document(response_id).set(response_data)
+        forward_success = forward_survey_data_to_partners(response_data)
+        if not forward_success:
+            print("Survey forwarding failed (SurveyTitans)")
+
 
         if tracking_id:
             tracking_ref = db.collection("survey_tracking").document(tracking_id)
@@ -262,6 +268,9 @@ def submit_public_response(survey_id):
             response_data["username"] = username
 
         db.collection("survey_responses").document(response_id).set(response_data)
+        forward_success = forward_survey_data_to_partners(response_data)
+        if not forward_success:
+         print("Survey forwarding failed (SurveyTitans)")
 
         if tracking_id:
             tracking_ref = db.collection("survey_tracking").document(tracking_id)
