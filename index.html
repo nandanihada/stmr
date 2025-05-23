@@ -1,579 +1,573 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Survey Generator</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet" />
     <style>
-      body {
-        background-color: #f4f6f9;
-        font-family: "Arial", sans-serif;
-      }
-      .app-container {
-        max-width: 900px;
-        margin: 30px auto;
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-      }
-      .nav-pills .nav-link.active {
-        background-color: #007bff;
-        color: white;
-      }
-      .survey-card {
-        margin-bottom: 15px;
-        border-left: 4px solid #007bff;
-      }
-      .question-card {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        padding: 15px;
-      }
-      .loading-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-      }
-      .chart-container {
-        max-height: 400px;
-        margin-top: 20px;
-      }
-      .share-link-container {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 15px;
-        margin-bottom: 15px;
-      }
-      .share-link-input {
-        cursor: pointer;
-      }
-      .fade-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(255, 255, 255, 0.9);
-        display: none;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        opacity: 0;
-        transition: opacity 0.4s ease-in-out;
-      }
+        body {
+            background-color: #f4f6f9;
+            font-family: "Arial", sans-serif;
+        }
 
-      .fade-overlay.active {
-        display: flex;
-        opacity: 1;
-      }
+        .app-container {
+            max-width: 900px;
+            margin: 30px auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
 
-      .spinner-content {
-        text-align: center;
-      }
+        .nav-pills .nav-link.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .survey-card {
+            margin-bottom: 15px;
+            border-left: 4px solid #007bff;
+        }
+
+        .question-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .chart-container {
+            max-height: 400px;
+            margin-top: 20px;
+        }
+
+        .share-link-container {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .share-link-input {
+            cursor: pointer;
+        }
+
+        .fade-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+
+        .fade-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .spinner-content {
+            text-align: center;
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="container app-container">
-      <ul class="nav nav-pills nav-fill mb-4" id="appTabs">
-        <li class="nav-item">
-          <a class="nav-link active" href="#create" data-bs-toggle="tab"
-            >Create Survey</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#surveys" data-bs-toggle="tab"
-            >Existing Surveys</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#responses" data-bs-toggle="tab"
-            >Survey Responses</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#postback" data-bs-toggle="tab"
-            >Postback Generator</a
-          >
-        </li>
-      </ul>
+        <ul class="nav nav-pills nav-fill mb-4" id="appTabs">
+            <li class="nav-item">
+                <a class="nav-link active" href="#create" data-bs-toggle="tab">Create Survey</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#surveys" data-bs-toggle="tab">Existing Surveys</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#responses" data-bs-toggle="tab">Survey Responses</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#postback" data-bs-toggle="tab">Postback Generator</a>
+            </li>
+        </ul>
 
-      <div class="tab-content">
-        <!-- Create Survey Tab -->
-        <div class="tab-pane fade show active" id="create">
-          <div class="card">
-            <div class="card-body">
-              <h3 class="card-title mb-4">Generate AI Survey</h3>
-              <div class="row">
-                <div class="col-md-8 mb-3">
-                  <input
-                    type="text"
-                    id="surveyTopic"
-                    class="form-control"
-                    placeholder="Enter survey topic (e.g., Customer Satisfaction)"
-                  />
-                </div>
-                <div class="col-md-4 mb-3">
-                  <select id="responseType" class="form-select">
-                    <option value="multiple_choice">Multiple Choice</option>
-                    <option value="likert_scale">Likert Scale</option>
-                    <option value="yes_no">Yes/No</option>
-                  </select>
-                </div>
-              </div>
-              <button id="generateSurveyBtn" class="btn btn-primary w-100">
-                <i class="bi bi-magic me-2"></i>Generate Survey
-              </button>
-            </div>
-          </div>
-
-          <div id="surveyPreview" class="mt-4" style="display: none">
-            <h4>Survey Preview</h4>
-            <div class="share-link-container">
-              <h5>Share this survey:</h5>
-              <div class="input-group mb-3">
-                <input
-                  type="text"
-                  id="surveyShareLink"
-                  class="form-control share-link-input"
-                  readonly
-                />
-                <button
-                  class="btn btn-outline-secondary"
-                  type="button"
-                  id="copyLinkBtn"
-                >
-                  <i class="bi bi-clipboard"></i> Copy
-                </button>
-              </div>
-            </div>
-            <form id="surveyForm">
-              <div id="questionContainer"></div>
-              <button type="submit" class="btn btn-success w-100 mt-3">
-                <i class="bi bi-send me-2"></i>Submit Survey Responses
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Existing Surveys Tab -->
-        <div class="tab-pane fade" id="surveys">
-          <div class="card">
-            <div class="card-body">
-              <h3 class="card-title">Existing Surveys</h3>
-              <div id="existingSurveysList" class="list-group">
-                <!-- Surveys will be dynamically populated here -->
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Survey Responses Tab -->
-        <div class="tab-pane fade" id="responses">
-          <div class="card">
-            <div class="card-body">
-              <h3 class="card-title">Survey Responses</h3>
-              <select id="responseSurveySelect" class="form-select mb-3">
-                <option>Select a Survey</option>
-              </select>
-              <div id="responseAnalytics" class="mt-3">
-                <!-- Insights Button + Output -->
-                <div class="mt-4">
-                  <button
-                    class="btn btn-outline-primary"
-                    onclick="getInsightsFromSelected()"
-                  >
-                    Generate Business Insights
-                  </button>
-                  <div
-                    id="insightOutput"
-                    class="mt-3 alert alert-info"
-                    style="display: none"
-                  ></div>
+        <div class="tab-content">
+            <!-- Create Survey Tab -->
+            <div class="tab-pane fade show active" id="create">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4">Generate AI Survey</h3>
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <input type="text" id="surveyTopic" class="form-control"
+                                    placeholder="Enter survey topic (e.g., Customer Satisfaction)" />
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <select id="responseType" class="form-select">
+                                    <option value="multiple_choice">Multiple Choice</option>
+                                    <option value="likert_scale">Likert Scale</option>
+                                    <option value="yes_no">Yes/No</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="generateSurveyBtn" class="btn btn-primary w-100">
+                            <i class="bi bi-magic me-2"></i>Generate Survey
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Response analytics will be displayed here -->
-              </div>
+                <div id="surveyPreview" class="mt-4" style="display: none">
+                    <h4>Survey Preview</h4>
+                    <div class="share-link-container">
+                        <h5>Share this survey:</h5>
+                        <div class="input-group mb-3">
+                            <input type="text" id="surveyShareLink" class="form-control share-link-input" readonly />
+                            <button class="btn btn-outline-secondary" type="button" id="copyLinkBtn">
+                                <i class="bi bi-clipboard"></i> Copy
+                            </button>
+                        </div>
+                    </div>
+                    <form id="surveyForm">
+                        <div id="questionContainer"></div>
+                        <button type="submit" class="btn btn-success w-100 mt-3">
+                            <i class="bi bi-send me-2"></i>Submit Survey Responses
+                        </button>
+                    </form>
+                </div>
             </div>
-          </div>
+
+            <!-- Existing Surveys Tab -->
+            <div class="tab-pane fade" id="surveys">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Existing Surveys</h3>
+                        <div id="existingSurveysList" class="list-group">
+                            <!-- Surveys will be dynamically populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Survey Responses Tab -->
+            <div class="tab-pane fade" id="responses">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Survey Responses</h3>
+                        <select id="responseSurveySelect" class="form-select mb-3">
+                            <option>Select a Survey</option>
+                        </select>
+                        <div id="responseAnalytics" class="mt-3">
+                            <!-- Insights Button + Output -->
+                            <div class="mt-4">
+                                <button class="btn btn-outline-primary" onclick="getInsightsFromSelected()">
+                                    Generate Business Insights
+                                </button>
+                                <div id="insightOutput" class="mt-3 alert alert-info" style="display: none"></div>
+                            </div>
+
+                            <!-- Response analytics will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Postback Generator Tab -->
+            <div class="tab-pane fade" id="postback">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title mb-3">🔁 Postback Generator</h3>
+
+                        <div class="mb-3">
+                            <label for="subidInput" class="form-label">Enter Sub ID</label>
+                            <input type="text" id="subidInput" class="form-control" placeholder="e.g. abc123" />
+                        </div>
+
+                        <button id="generatePostbackBtn" class="btn btn-primary w-100 mb-3">Generate Postback
+                            URL</button>
+
+                        <div class="input-group mb-3">
+                            <input type="text" id="postbackResult" class="form-control" readonly
+                                placeholder="Generated postback URL appears here" />
+                            <button id="copyPostbackBtn" class="btn btn-outline-secondary">Copy</button>
+                        </div>
+
+                        <button id="testPostbackBtn" class="btn btn-success w-100">Test Postback (Simulate Hit)</button>
+
+                        <div id="postbackMessage" class="alert mt-3 d-none"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay" class="loading-overlay" style="display: none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Postback Generator Tab -->
-        <div class="tab-pane fade" id="postback">
-  <div class="card">
-    <div class="card-body">
-      <h3 class="card-title mb-3">🔁 Postback Generator</h3>
-
-      <div class="mb-3">
-        <label for="subidInput" class="form-label">Enter Sub ID</label>
-        <input type="text" id="subidInput" class="form-control" placeholder="e.g. abc123" />
-      </div>
-
-      <button id="generatePostbackBtn" class="btn btn-primary w-100 mb-3">Generate Postback URL</button>
-
-      <div class="input-group mb-3">
-        <input type="text" id="postbackResult" class="form-control" readonly placeholder="Generated postback URL appears here" />
-        <button id="copyPostbackBtn" class="btn btn-outline-secondary">Copy</button>
-      </div>
-
-      <button id="testPostbackBtn" class="btn btn-success w-100">Test Postback (Simulate Hit)</button>
-
-      <div id="postbackMessage" class="alert mt-3 d-none"></div>
-    </div>
-  </div>
-</div>
-
-      <!-- Loading Overlay -->
-      <div id="loadingOverlay" class="loading-overlay" style="display: none">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
+        <!-- Modal for Survey Details -->
+        <div class="modal fade" id="surveyDetailModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Survey Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body" id="surveyDetailModalBody">
+                        <!-- Survey details will be populated here -->
+                    </div>
+                </div>
+            </div>
+            <!-- Full Page Spinner Overlay -->
+            <!-- Spinner Full Screen -->
+            <div id="redirectSpinner" class="fade-overlay">
+                <div class="spinner-content">
+                    <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem"></div>
+                    <p class="mt-3 text-center text-primary">Redirecting to survey...</p>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Modal for Survey Details -->
-    <div class="modal fade" id="surveyDetailModal" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Survey Details</h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-            ></button>
-          </div>
-          <div class="modal-body" id="surveyDetailModalBody">
-            <!-- Survey details will be populated here -->
-          </div>
-        </div>
-      </div>
-      <!-- Full Page Spinner Overlay -->
-      <!-- Spinner Full Screen -->
-      <div id="redirectSpinner" class="fade-overlay">
-        <div class="spinner-content">
-          <div
-            class="spinner-border text-primary"
-            role="status"
-            style="width: 4rem; height: 4rem"
-          ></div>
-          <p class="mt-3 text-center text-primary">Redirecting to survey...</p>
-        </div>
-      </div>
-    </div>
+        <!-- External Libraries -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- External Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // Configuration
+            const SERVER_URL = "https://survey-ai-033z.onrender.com";
+            let currentSurveyId = null;
+            let currentSurveyData = null;
 
-    <script>
-      // Configuration
-      const SERVER_URL = "https://survey-ai-033z.onrender.com";
-      let currentSurveyId = null;
-      let currentSurveyData = null;
+            // DOM Elements
+            const generateSurveyBtn = document.getElementById("generateSurveyBtn");
+            const surveyTopic = document.getElementById("surveyTopic");
+            const responseType = document.getElementById("responseType");
+            const surveyPreview = document.getElementById("surveyPreview");
+            const questionContainer = document.getElementById("questionContainer");
+            const surveyForm = document.getElementById("surveyForm");
+            const existingSurveysList = document.getElementById(
+                "existingSurveysList"
+            );
+            const loadingOverlay = document.getElementById("loadingOverlay");
+            const responseSurveySelect = document.getElementById(
+                "responseSurveySelect"
+            );
+            const responseAnalytics = document.getElementById("responseAnalytics");
+            const surveyShareLink = document.getElementById("surveyShareLink");
+            const copyLinkBtn = document.getElementById("copyLinkBtn");
+            //   postback
+            const postbackBase = 'https://survey-ai-033z.onrender.com/postback-handler';
+            const subidInput = document.getElementById('subidInput');
+            const postbackResult = document.getElementById('postbackResult');
+            const generatePostbackBtn = document.getElementById('generatePostbackBtn');
+            const copyPostbackBtn = document.getElementById('copyPostbackBtn');
+            const testPostbackBtn = document.getElementById('testPostbackBtn');
+            const postbackMessage = document.getElementById('postbackMessage');
+            generatePostbackBtn.addEventListener('click', () => {
+                const subid = subidInput.value.trim();
+                if (!subid) {
+                    showPostbackMessage("❌ Please enter a Sub ID", "danger");
+                    return;
+                }
 
-      // DOM Elements
-      const generateSurveyBtn = document.getElementById("generateSurveyBtn");
-      const surveyTopic = document.getElementById("surveyTopic");
-      const responseType = document.getElementById("responseType");
-      const surveyPreview = document.getElementById("surveyPreview");
-      const questionContainer = document.getElementById("questionContainer");
-      const surveyForm = document.getElementById("surveyForm");
-      const existingSurveysList = document.getElementById(
-        "existingSurveysList"
-      );
-      const loadingOverlay = document.getElementById("loadingOverlay");
-      const responseSurveySelect = document.getElementById(
-        "responseSurveySelect"
-      );
-      const responseAnalytics = document.getElementById("responseAnalytics");
-      const surveyShareLink = document.getElementById("surveyShareLink");
-      const copyLinkBtn = document.getElementById("copyLinkBtn");
-    //   postback
-    const postbackBase = 'https://survey-ai-033z.onrender.com/postback-handler';
+                const url = `${postbackBase}?transaction_id=${subid}&status=1&reward=0.1&currency=USD&sid1=${subid}`;
+                postbackResult.value = url;
+                showPostbackMessage("✅ Postback URL generated!", "success");
+            });
+
+            function showPostbackMessage(message, type = "info") {
+                postbackMessage.className = `alert alert-${type}`;
+                postbackMessage.textContent = message;
+                postbackMessage.classList.remove("d-none");
+            }
 
 
-      // Utility Functions
-      function showLoading() {
-        loadingOverlay.style.display = "flex";
-      }
+            // Utility Functions
+            function showLoading() {
+                loadingOverlay.style.display = "flex";
+            }
 
-      function hideLoading() {
-        loadingOverlay.style.display = "none";
-      }
+            function hideLoading() {
+                loadingOverlay.style.display = "none";
+            }
 
-      function displayErrorToast(message) {
-        const toastContainer = document.createElement("div");
-        toastContainer.className =
-          "toast-container position-fixed bottom-0 end-0 p-3";
-        const toast = document.createElement("div");
-        toast.className = "toast text-bg-danger";
-        toast.innerHTML = `
+            function displayErrorToast(message) {
+                const toastContainer = document.createElement("div");
+                toastContainer.className =
+                    "toast-container position-fixed bottom-0 end-0 p-3";
+                const toast = document.createElement("div");
+                toast.className = "toast text-bg-danger";
+                toast.innerHTML = `
                 <div class="toast-header">
                     <strong class="me-auto">Error</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
                 </div>
                 <div class="toast-body">${message}</div>
             `;
-        toastContainer.appendChild(toast);
-        document.body.appendChild(toastContainer);
-        const toastInstance = new bootstrap.Toast(toast);
-        toastInstance.show();
-      }
+                toastContainer.appendChild(toast);
+                document.body.appendChild(toastContainer);
+                const toastInstance = new bootstrap.Toast(toast);
+                toastInstance.show();
+            }
 
-      function displaySuccessToast(message) {
-        const toastContainer = document.createElement("div");
-        toastContainer.className =
-          "toast-container position-fixed bottom-0 end-0 p-3";
-        const toast = document.createElement("div");
-        toast.className = "toast text-bg-success";
-        toast.innerHTML = `
+            function displaySuccessToast(message) {
+                const toastContainer = document.createElement("div");
+                toastContainer.className =
+                    "toast-container position-fixed bottom-0 end-0 p-3";
+                const toast = document.createElement("div");
+                toast.className = "toast text-bg-success";
+                toast.innerHTML = `
                 <div class="toast-header">
                     <strong class="me-auto">Success</strong>
                     <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
                 </div>
                 <div class="toast-body">${message}</div>
             `;
-        toastContainer.appendChild(toast);
-        document.body.appendChild(toastContainer);
-        const toastInstance = new bootstrap.Toast(toast);
-        toastInstance.show();
+                toastContainer.appendChild(toast);
+                document.body.appendChild(toastContainer);
+                const toastInstance = new bootstrap.Toast(toast);
+                toastInstance.show();
 
-        // Remove toast after it hides
-        toast.addEventListener("hidden.bs.toast", () => {
-          toastContainer.remove();
-        });
-      }
+                // Remove toast after it hides
+                toast.addEventListener("hidden.bs.toast", () => {
+                    toastContainer.remove();
+                });
+            }
 
-      // Survey Generation
-      generateSurveyBtn.addEventListener("click", async () => {
-        const topic = surveyTopic.value.trim();
-        const type = responseType.value;
+            // Survey Generation
+            generateSurveyBtn.addEventListener("click", async () => {
+                const topic = surveyTopic.value.trim();
+                const type = responseType.value;
 
-        if (!topic) {
-          displayErrorToast("Please enter a survey topic");
-          return;
-        }
+                if (!topic) {
+                    displayErrorToast("Please enter a survey topic");
+                    return;
+                }
 
-        try {
-          showLoading();
-          const response = await fetch(`${SERVER_URL}/generate`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              prompt: topic,
-              response_type: type,
-            }),
-          });
+                try {
+                    showLoading();
+                    const response = await fetch(`${SERVER_URL}/generate`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            prompt: topic,
+                            response_type: type,
+                        }),
+                    });
 
-          const data = await response.json();
+                    const data = await response.json();
 
-          if (data.error) {
-            throw new Error(data.error);
-          }
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
 
-          currentSurveyId = data.survey_id;
-          currentSurveyData = data.questions;
-          renderSurveyPreview(data.questions);
+                    currentSurveyId = data.survey_id;
+                    currentSurveyData = data.questions;
+                    renderSurveyPreview(data.questions);
 
-          const username = localStorage.getItem("username"); // Or however you're storing the logged-in user
-          const email = localStorage.getItem("email");
+                    const username = localStorage.getItem("username"); // Or however you're storing the logged-in user
+                    const email = localStorage.getItem("email");
 
-          const queryParams = new URLSearchParams({
-            id: currentSurveyId,
-            username: username || "",
-            email: email || "",
-          });
+                    const queryParams = new URLSearchParams({
+                        id: currentSurveyId,
+                        username: username || "",
+                        email: email || "",
+                    });
 
-          surveyShareLink.value = `https://pepperadsresponses.web.app/public_survey.html?${queryParams.toString()}`;
-        } catch (error) {
-          displayErrorToast(`Survey Generation Failed: ${error.message}`);
-          console.error(error);
-        } finally {
-          hideLoading();
-        }
-      });
+                    surveyShareLink.value = `https://pepperadsresponses.web.app/public_survey.html?${queryParams.toString()}`;
+                } catch (error) {
+                    displayErrorToast(`Survey Generation Failed: ${error.message}`);
+                    console.error(error);
+                } finally {
+                    hideLoading();
+                }
+            });
 
-      // Copy Survey Link
-      copyLinkBtn.addEventListener("click", () => {
-        if (!currentSurveyId) {
-          displayErrorToast("No survey to share");
-          return;
-        }
+            // Copy Survey Link
+            copyLinkBtn.addEventListener("click", () => {
+                if (!currentSurveyId) {
+                    displayErrorToast("No survey to share");
+                    return;
+                }
 
-        surveyShareLink.select();
-        document.execCommand("copy");
-        displaySuccessToast("Survey link copied to clipboard!");
-      });
+                surveyShareLink.select();
+                document.execCommand("copy");
+                displaySuccessToast("Survey link copied to clipboard!");
+            });
 
-      // Select link when clicked
-      surveyShareLink.addEventListener("click", function () {
-        this.select();
-      });
+            // Select link when clicked
+            surveyShareLink.addEventListener("click", function () {
+                this.select();
+            });
 
-      // Render Survey Preview
-      function renderSurveyPreview(questions) {
-        questionContainer.innerHTML = "";
-        questions.forEach((question, index) => {
-          const questionCard = document.createElement("div");
-          questionCard.className = "card question-card";
+            // Render Survey Preview
+            function renderSurveyPreview(questions) {
+                questionContainer.innerHTML = "";
+                questions.forEach((question, index) => {
+                    const questionCard = document.createElement("div");
+                    questionCard.className = "card question-card";
 
-          const questionTitle = document.createElement("h5");
-          questionTitle.textContent = `${index + 1}. ${question.question}`;
-          questionCard.appendChild(questionTitle);
+                    const questionTitle = document.createElement("h5");
+                    questionTitle.textContent = `${index + 1}. ${question.question}`;
+                    questionCard.appendChild(questionTitle);
 
-          // Render options based on response type
-          const optionsContainer = document.createElement("div");
-          question.options.forEach((option, optionIndex) => {
-            const optionWrapper = document.createElement("div");
-            optionWrapper.className = "form-check";
+                    // Render options based on response type
+                    const optionsContainer = document.createElement("div");
+                    question.options.forEach((option, optionIndex) => {
+                        const optionWrapper = document.createElement("div");
+                        optionWrapper.className = "form-check";
 
-            const optionInput = document.createElement("input");
-            optionInput.type = "radio";
-            optionInput.className = "form-check-input";
-            optionInput.name = `question-${index}`;
-            optionInput.id = `question-${index}-option-${optionIndex}`;
-            optionInput.value = option;
-            optionInput.required = true;
+                        const optionInput = document.createElement("input");
+                        optionInput.type = "radio";
+                        optionInput.className = "form-check-input";
+                        optionInput.name = `question-${index}`;
+                        optionInput.id = `question-${index}-option-${optionIndex}`;
+                        optionInput.value = option;
+                        optionInput.required = true;
 
-            const optionLabel = document.createElement("label");
-            optionLabel.className = "form-check-label";
-            optionLabel.htmlFor = `question-${index}-option-${optionIndex}`;
-            optionLabel.textContent = option;
+                        const optionLabel = document.createElement("label");
+                        optionLabel.className = "form-check-label";
+                        optionLabel.htmlFor = `question-${index}-option-${optionIndex}`;
+                        optionLabel.textContent = option;
 
-            optionWrapper.appendChild(optionInput);
-            optionWrapper.appendChild(optionLabel);
-            optionsContainer.appendChild(optionWrapper);
-          });
+                        optionWrapper.appendChild(optionInput);
+                        optionWrapper.appendChild(optionLabel);
+                        optionsContainer.appendChild(optionWrapper);
+                    });
 
-          questionCard.appendChild(optionsContainer);
-          questionContainer.appendChild(questionCard);
-        });
+                    questionCard.appendChild(optionsContainer);
+                    questionContainer.appendChild(questionCard);
+                });
 
-        surveyPreview.style.display = "block";
-        loadExistingSurveys();
-      }
+                surveyPreview.style.display = "block";
+                loadExistingSurveys();
+            }
 
-      // Submit Survey Responses
-      surveyForm.addEventListener("submit", async (e) => {
-        e.preventDefault();
+            // Submit Survey Responses
+            surveyForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
 
-        if (!currentSurveyId) {
-          displayErrorToast("No active survey");
-          return;
-        }
+                if (!currentSurveyId) {
+                    displayErrorToast("No active survey");
+                    return;
+                }
 
-        const responses = {};
-        currentSurveyData.forEach((question, index) => {
-          const selectedOption = document.querySelector(
-            `input[name="question-${index}"]:checked`
-          );
-          if (selectedOption) {
-            responses[`Q${index + 1}`] = selectedOption.value;
-          }
-        });
+                const responses = {};
+                currentSurveyData.forEach((question, index) => {
+                    const selectedOption = document.querySelector(
+                        `input[name="question-${index}"]:checked`
+                    );
+                    if (selectedOption) {
+                        responses[`Q${index + 1}`] = selectedOption.value;
+                    }
+                });
 
-        try {
-          showLoading();
-          const response = await fetch(`${SERVER_URL}/submit`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              survey_id: currentSurveyId,
-              responses,
-            }),
-          });
+                try {
+                    showLoading();
+                    const response = await fetch(`${SERVER_URL}/submit`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            survey_id: currentSurveyId,
+                            responses,
+                        }),
+                    });
 
-          const data = await response.json();
+                    const data = await response.json();
 
-          if (data.error) {
-            throw new Error(data.error);
-          }
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
 
-          displaySuccessToast("Survey responses submitted successfully!");
-          surveyForm.reset();
-          surveyPreview.style.display = "none";
-          currentSurveyId = null;
-          currentSurveyData = null;
-        } catch (error) {
-          displayErrorToast(`Response Submission Failed: ${error.message}`);
-          console.error(error);
-        } finally {
-          hideLoading();
-        }
-      });
+                    displaySuccessToast("Survey responses submitted successfully!");
+                    surveyForm.reset();
+                    surveyPreview.style.display = "none";
+                    currentSurveyId = null;
+                    currentSurveyData = null;
+                } catch (error) {
+                    displayErrorToast(`Response Submission Failed: ${error.message}`);
+                    console.error(error);
+                } finally {
+                    hideLoading();
+                }
+            });
 
-      // Load Existing Surveys
-      async function loadExistingSurveys() {
-        try {
-          showLoading();
-          const response = await fetch(`${SERVER_URL}/surveys`);
-          const data = await response.json();
+            // Load Existing Surveys
+            async function loadExistingSurveys() {
+                try {
+                    showLoading();
+                    const response = await fetch(`${SERVER_URL}/surveys`);
+                    const data = await response.json();
 
-          existingSurveysList.innerHTML = "";
-          responseSurveySelect.innerHTML = "<option>Select a Survey</option>";
+                    existingSurveysList.innerHTML = "";
+                    responseSurveySelect.innerHTML = "<option>Select a Survey</option>";
 
-          if (data.surveys && data.surveys.length > 0) {
-            data.surveys.forEach((survey) => {
-              // Existing Surveys List
-              const surveyItem = document.createElement("div");
-              surveyItem.className = "list-group-item list-group-item-action";
-              surveyItem.innerHTML = `
+                    if (data.surveys && data.surveys.length > 0) {
+                        data.surveys.forEach((survey) => {
+                            // Existing Surveys List
+                            const surveyItem = document.createElement("div");
+                            surveyItem.className = "list-group-item list-group-item-action";
+                            surveyItem.innerHTML = `
                             <div class="d-flex w-100 justify-content-between">
                                 <h5 class="mb-1">${survey.prompt}</h5>
                                 <small>${new Date(
-                                  survey.created_at?._seconds * 1000
-                                ).toLocaleDateString()}</small>
+                                survey.created_at?._seconds * 1000
+                            ).toLocaleDateString()}</small>
                             </div>
                         `;
-              surveyItem.addEventListener("click", () =>
-                loadSurveyDetails(survey.id)
-              );
-              existingSurveysList.appendChild(surveyItem);
+                            surveyItem.addEventListener("click", () =>
+                                loadSurveyDetails(survey.id)
+                            );
+                            existingSurveysList.appendChild(surveyItem);
 
-              // Responses Survey Select
-              const surveyOption = document.createElement("option");
-              surveyOption.value = survey.id;
-              surveyOption.textContent = survey.prompt;
-              responseSurveySelect.appendChild(surveyOption);
-            });
-          } else {
-            existingSurveysList.innerHTML =
-              '<div class="alert alert-info">No surveys created yet</div>';
-          }
-        } catch (error) {
-          displayErrorToast(`Failed to load surveys: ${error.message}`);
-          console.error(error);
-        } finally {
-          hideLoading();
-        }
-      }
+                            // Responses Survey Select
+                            const surveyOption = document.createElement("option");
+                            surveyOption.value = survey.id;
+                            surveyOption.textContent = survey.prompt;
+                            responseSurveySelect.appendChild(surveyOption);
+                        });
+                    } else {
+                        existingSurveysList.innerHTML =
+                            '<div class="alert alert-info">No surveys created yet</div>';
+                    }
+                } catch (error) {
+                    displayErrorToast(`Failed to load surveys: ${error.message}`);
+                    console.error(error);
+                } finally {
+                    hideLoading();
+                }
+            }
 
-      // Load Survey Details
-      async function loadSurveyDetails(surveyId) {
-        try {
-          showLoading();
-          const response = await fetch(`${SERVER_URL}/survey/${surveyId}`);
-          const survey = await response.json();
+            // Load Survey Details
+            async function loadSurveyDetails(surveyId) {
+                try {
+                    showLoading();
+                    const response = await fetch(`${SERVER_URL}/survey/${surveyId}`);
+                    const survey = await response.json();
 
-          const modalBody = document.getElementById("surveyDetailModalBody");
-          modalBody.innerHTML = `
+                    const modalBody = document.getElementById("surveyDetailModalBody");
+                    modalBody.innerHTML = `
                     <h4>${survey.prompt}</h4>
                     <div class="mb-3">
                         <label class="form-label">Shareable Link:</label>
@@ -581,81 +575,81 @@
                     </div>
                     <div class="list-group">
                         ${survey.questions
-                          .map(
-                            (q, index) => `
+                            .map(
+                                (q, index) => `
                             <div class="list-group-item">
                                 <h5>Q${index + 1}: ${q.question}</h5>
                                 <ul class="list-unstyled">
                                     ${q.options
-                                      .map((opt) => `<li>• ${opt}</li>`)
-                                      .join("")}
+                                        .map((opt) => `<li>• ${opt}</li>`)
+                                        .join("")}
                                 </ul>
                             </div>
                         `
-                          )
-                          .join("")}
+                            )
+                            .join("")}
                     </div>
                 `;
-          const modal = new bootstrap.Modal(
-            document.getElementById("surveyDetailModal")
-          );
-          modal.show();
-        } catch (error) {
-          displayErrorToast(`Failed to load survey details: ${error.message}`);
-          console.error(error);
-        } finally {
-          hideLoading();
-        }
-      }
+                    const modal = new bootstrap.Modal(
+                        document.getElementById("surveyDetailModal")
+                    );
+                    modal.show();
+                } catch (error) {
+                    displayErrorToast(`Failed to load survey details: ${error.message}`);
+                    console.error(error);
+                } finally {
+                    hideLoading();
+                }
+            }
 
-      // Load Survey Responses Analytics
-      responseSurveySelect.addEventListener("change", async () => {
-        const surveyId = responseSurveySelect.value;
-        if (!surveyId) return;
+            // Load Survey Responses Analytics
+            responseSurveySelect.addEventListener("change", async () => {
+                const surveyId = responseSurveySelect.value;
+                if (!surveyId) return;
 
-        try {
-          showLoading();
-          const response = await fetch(`${SERVER_URL}/responses/${surveyId}`);
-          const data = await response.json();
+                try {
+                    showLoading();
+                    const response = await fetch(`${SERVER_URL}/responses/${surveyId}`);
+                    const data = await response.json();
 
-          if (data.error) {
-            throw new Error(data.error);
-          }
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
 
-          renderResponseAnalytics(data.responses);
-        } catch (error) {
-          displayErrorToast(`Failed to load responses: ${error.message}`);
-          console.error(error);
-        } finally {
-          hideLoading();
-        }
-      });
+                    renderResponseAnalytics(data.responses);
+                } catch (error) {
+                    displayErrorToast(`Failed to load responses: ${error.message}`);
+                    console.error(error);
+                } finally {
+                    hideLoading();
+                }
+            });
 
-      async function getInsightsFromSelected() {
-        const surveyId = responseSurveySelect.value;
-        const insightBox = document.getElementById("insightOutput");
+            async function getInsightsFromSelected() {
+                const surveyId = responseSurveySelect.value;
+                const insightBox = document.getElementById("insightOutput");
 
-        if (!surveyId || surveyId === "Select a Survey") {
-          displayErrorToast("Please select a survey to generate insights.");
-          return;
-        }
+                if (!surveyId || surveyId === "Select a Survey") {
+                    displayErrorToast("Please select a survey to generate insights.");
+                    return;
+                }
 
-        try {
-          insightBox.style.display = "block";
-          insightBox.innerHTML =
-            '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div> Analyzing responses...';
+                try {
+                    insightBox.style.display = "block";
+                    insightBox.innerHTML =
+                        '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div> Analyzing responses...';
 
-          const response = await fetch(`${SERVER_URL}/insights`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ survey_id: surveyId }),
-          });
+                    const response = await fetch(`${SERVER_URL}/insights`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ survey_id: surveyId }),
+                    });
 
-          const data = await response.json();
+                    const data = await response.json();
 
-          if (data.insights) {
-            insightBox.className = "mt-3 alert alert-success";
-            insightBox.innerHTML = `
+                    if (data.insights) {
+                        insightBox.className = "mt-3 alert alert-success";
+                        insightBox.innerHTML = `
     <p>${data.insights}</p>
     <a href="precheck.html" 
        class="btn btn-outline-primary mt-3"
@@ -663,121 +657,122 @@
        Take Related Survey
     </a>
   `;
-          } else {
-            insightBox.className = "mt-3 alert alert-warning";
-            insightBox.innerText = "No insights found for this survey.";
-          }
-        } catch (err) {
-          console.error(err);
-          insightBox.className = "mt-3 alert alert-danger";
-          insightBox.innerText = "Failed to fetch insights.";
-        }
-      }
-
-      // Render Survey Responses Analytics
-      function renderResponseAnalytics(responses) {
-        if (!responses || responses.length === 0) {
-          responseAnalytics.innerHTML =
-            '<div class="alert alert-info">No responses available</div>';
-          return;
-        }
-
-        // Group responses by question
-        const questions = {};
-        responses.forEach((response) => {
-          Object.entries(response.responses).forEach(([question, answer]) => {
-            if (!questions[question]) {
-              questions[question] = {};
+                    } else {
+                        insightBox.className = "mt-3 alert alert-warning";
+                        insightBox.innerText = "No insights found for this survey.";
+                    }
+                } catch (err) {
+                    console.error(err);
+                    insightBox.className = "mt-3 alert alert-danger";
+                    insightBox.innerText = "Failed to fetch insights.";
+                }
             }
-            questions[question][answer] =
-              (questions[question][answer] || 0) + 1;
-          });
-        });
-        //SPinner for analytics
-        function goToSurveyWithDelay(link) {
-          const spinner = document.getElementById("redirectSpinner");
-          spinner.classList.add("active");
 
-          // Allow transition to complete before redirect
-          setTimeout(() => {
-            window.location.href = link.href;
-          }, 8000);
+            // Render Survey Responses Analytics
+            function renderResponseAnalytics(responses) {
+                if (!responses || responses.length === 0) {
+                    responseAnalytics.innerHTML =
+                        '<div class="alert alert-info">No responses available</div>';
+                    return;
+                }
 
-          return false;
-        }
+                // Group responses by question
+                const questions = {};
+                responses.forEach((response) => {
+                    Object.entries(response.responses).forEach(([question, answer]) => {
+                        if (!questions[question]) {
+                            questions[question] = {};
+                        }
+                        questions[question][answer] =
+                            (questions[question][answer] || 0) + 1;
+                    });
+                });
+                //SPinner for analytics
+                function goToSurveyWithDelay(link) {
+                    const spinner = document.getElementById("redirectSpinner");
+                    spinner.classList.add("active");
 
-        async function redirectAfterCheck(surveyId, responses) {
-          const spinner = document.getElementById("redirectSpinner");
-          spinner.classList.add("active");
+                    // Allow transition to complete before redirect
+                    setTimeout(() => {
+                        window.location.href = link.href;
+                    }, 8000);
 
-          try {
-            const res = await fetch(`${SERVER_URL}/check-logic`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                survey_id: surveyId,
-                responses: responses,
-              }),
-            });
+                    return false;
+                }
 
-            const data = await res.json();
+                async function redirectAfterCheck(surveyId, responses) {
+                    const spinner = document.getElementById("redirectSpinner");
+                    spinner.classList.add("active");
 
-            // Spinner delay + redirect
-            setTimeout(() => {
-              window.location.href = data.next_page;
-            }, 2000);
-          } catch (err) {
-            console.error("Logic check failed:", err);
-            spinner.classList.remove("active");
-            alert("Something went wrong. Try again.");
-          }
-        }
+                    try {
+                        const res = await fetch(`${SERVER_URL}/check-logic`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                survey_id: surveyId,
+                                responses: responses,
+                            }),
+                        });
 
-        // Create a chart for each question
-        responseAnalytics.innerHTML = "";
-        Object.entries(questions).forEach(([question, answers]) => {
-          const questionDiv = document.createElement("div");
-          questionDiv.className = "mb-4";
-          questionDiv.innerHTML = `<h5>${question}</h5>`;
+                        const data = await res.json();
 
-          const canvas = document.createElement("canvas");
-          questionDiv.appendChild(canvas);
-          responseAnalytics.appendChild(questionDiv);
+                        // Spinner delay + redirect
+                        setTimeout(() => {
+                            window.location.href = data.next_page;
+                        }, 2000);
+                    } catch (err) {
+                        console.error("Logic check failed:", err);
+                        spinner.classList.remove("active");
+                        alert("Something went wrong. Try again.");
+                    }
+                }
 
-          const labels = Object.keys(answers);
-          const data = Object.values(answers);
+                // Create a chart for each question
+                responseAnalytics.innerHTML = "";
+                Object.entries(questions).forEach(([question, answers]) => {
+                    const questionDiv = document.createElement("div");
+                    questionDiv.className = "mb-4";
+                    questionDiv.innerHTML = `<h5>${question}</h5>`;
 
-          new Chart(canvas, {
-            type: "bar",
-            data: {
-              labels: labels,
-              datasets: [
-                {
-                  label: "Responses",
-                  data: data,
-                  backgroundColor: "rgba(0, 123, 255, 0.5)",
-                  borderColor: "rgba(0, 123, 255, 1)",
-                  borderWidth: 1,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  ticks: {
-                    stepSize: 1,
-                  },
-                },
-              },
-            },
-          });
-        });
-      }
+                    const canvas = document.createElement("canvas");
+                    questionDiv.appendChild(canvas);
+                    responseAnalytics.appendChild(questionDiv);
 
-      // Initialize Existing Surveys on page load
-      loadExistingSurveys();
-    </script>
-  </body>
+                    const labels = Object.keys(answers);
+                    const data = Object.values(answers);
+
+                    new Chart(canvas, {
+                        type: "bar",
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                {
+                                    label: "Responses",
+                                    data: data,
+                                    backgroundColor: "rgba(0, 123, 255, 0.5)",
+                                    borderColor: "rgba(0, 123, 255, 1)",
+                                    borderWidth: 1,
+                                },
+                            ],
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1,
+                                    },
+                                },
+                            },
+                        },
+                    });
+                });
+            }
+
+            // Initialize Existing Surveys on page load
+            loadExistingSurveys();
+        </script>
+</body>
+
 </html>

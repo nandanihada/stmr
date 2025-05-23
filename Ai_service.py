@@ -418,6 +418,22 @@ def view_survey(survey_id):
     except Exception as e:
         print(f"Survey view error: {e}")
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
+@app.route('/surveys', methods=['GET'])
+def list_surveys():
+    try:
+        surveys_ref = db.collection("surveys").order_by("created_at", direction=firestore.Query.DESCENDING)
+        docs = surveys_ref.stream()
+
+        surveys = []
+        for doc in docs:
+            data = doc.to_dict()
+            data['id'] = doc.id
+            surveys.append(data)
+
+        return jsonify({"surveys": surveys})
+    except Exception as e:
+        print("Error fetching surveys:", e)
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':
