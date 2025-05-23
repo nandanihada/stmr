@@ -12,12 +12,16 @@ from datetime import datetime
 import threading
 import os
 from integrations import forward_survey_data_to_partners
+from postback_handler import postback_bp
+
 
 
 BASE_URL = "https://pepperadsresponses.web.app"
 
 app = Flask(__name__)
 CORS(app)
+app.register_blueprint(postback_bp)
+
 
 # Gemini API Configuration
 genai.configure(api_key="AIzaSyAxEoutxU_w1OamJUe4FMOzr5ZdUyz8R4k")
@@ -380,7 +384,7 @@ from flask import request, jsonify
 
 @app.route('/survey/<survey_id>/view', methods=['GET'])
 def view_survey(survey_id):
-    try:
+    try: 
         # Get email and username from query params
         email = request.args.get("email")
         username = request.args.get("username")

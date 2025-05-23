@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Postback Generator - PepperAds</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+    .container {
+      max-width: 700px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    .btn-copy {
+      margin-left: 10px;
+    }
+    .form-section {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="mb-4">🔁 Postback URL Generator</h2>
+
+    <div class="form-section">
+      <label for="subid" class="form-label">Enter Sub ID</label>
+      <input type="text" id="subid" class="form-control" placeholder="e.g., abc123" />
+    </div>
+
+    <div class="form-section">
+      <button id="generateBtn" class="btn btn-primary w-100 mb-3">Generate Postback URL</button>
+
+      <div class="input-group">
+        <input type="text" id="postbackUrl" class="form-control" readonly placeholder="Postback URL will appear here" />
+        <button id="copyBtn" class="btn btn-outline-secondary btn-copy">Copy</button>
+      </div>
+
+      <button id="testBtn" class="btn btn-success w-100 mt-3">Test Postback (Simulate Hit)</button>
+    </div>
+
+    <div id="messageBox" class="alert mt-3 d-none"></div>
+  </div>
+
+  <script>
+    const BASE_URL = 'https://pepperads.com/postback-handler';
+    const subidInput = document.getElementById('subid');
+    const postbackUrlInput = document.getElementById('postbackUrl');
+    const generateBtn = document.getElementById('generateBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const testBtn = document.getElementById('testBtn');
+    const messageBox = document.getElementById('messageBox');
+
+    generateBtn.addEventListener('click', () => {
+      const subid = subidInput.value.trim();
+      if (!subid) {
+        showMessage("Please enter a Sub ID", "danger");
+        return;
+      }
+
+      const url = `${BASE_URL}?subid=${encodeURIComponent(subid)}`;
+      postbackUrlInput.value = url;
+      showMessage("✅ Postback URL generated successfully!", "success");
+    });
+
+    copyBtn.addEventListener('click', () => {
+      postbackUrlInput.select();
+      document.execCommand('copy');
+      showMessage("📋 URL copied to clipboard!", "info");
+    });
+
+    testBtn.addEventListener('click', async () => {
+      const url = postbackUrlInput.value;
+      if (!url) {
+        showMessage("Generate a postback URL first.", "warning");
+        return;
+      }
+
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        showMessage(`✅ Postback triggered. Server says: ${text}`, "success");
+      } catch (err) {
+        console.error(err);
+        showMessage("❌ Failed to test postback. Check console.", "danger");
+      }
+    });
+
+    function showMessage(msg, type = "info") {
+      messageBox.className = `alert alert-${type}`;
+      messageBox.textContent = msg;
+      messageBox.classList.remove("d-none");
+    }
+  </script>
+</body>
+</html>
