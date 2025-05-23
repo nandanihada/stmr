@@ -1,3 +1,5 @@
+
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
@@ -24,6 +26,8 @@ model = genai.GenerativeModel("gemini-1.5-flash-latest")
 # Firebase Setup
 try:
     cred_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+    if not cred_json:
+        raise Exception("GOOGLE_APPLICATION_CREDENTIALS_JSON env var is missing or empty.")
     cred = credentials.Certificate(json.loads(cred_json))
     firebase_admin.initialize_app(cred)
     db = firestore.client()
@@ -197,15 +201,10 @@ def track_survey_open():
             "opened_at": firestore.SERVER_TIMESTAMP,
             "submitted": False,
             "user_agent": request.headers.get('User-Agent', 'Unknown'),
-            "ip_address": request.remote_addr
+            "ip_address": request.remote_addr,
+            "email": email,
+            "username": username
         }
-        
-        # Store username and email if provided
-        if email:
-            tracking_data["email"] = email
-        if username:
-            tracking_data["username"] = username
-            
         db.collection("survey_tracking").document(tracking_id).set(tracking_data)
 
         return jsonify({"tracking_id": tracking_id, "message": "Survey opening tracked successfully"})
@@ -222,11 +221,6 @@ def get_survey(survey_id):
 
         if survey.exists:
             tracking_id = str(uuid.uuid4())
-            
-            # Extract username and email from query parameters if available
-            username = request.args.get('username')
-            email = request.args.get('email')
-            
             tracking_data = {
                 "survey_id": survey_id,
                 "tracking_id": tracking_id,
@@ -235,13 +229,6 @@ def get_survey(survey_id):
                 "user_agent": request.headers.get('User-Agent', 'Unknown'),
                 "ip_address": request.remote_addr
             }
-            
-            # Store username and email if provided in URL parameters
-            if email:
-                tracking_data["email"] = email
-            if username:
-                tracking_data["username"] = username
-                
             db.collection("survey_tracking").document(tracking_id).set(tracking_data)
 
             survey_data = survey.to_dict()
@@ -388,9 +375,27 @@ def get_survey_tracking(survey_id):
         print(f"Survey tracking stats error: {e}")
         return jsonify({"error": str(e)}), 500
 
+from datetime import datetime
+from flask import request, jsonify
+
 @app.route('/survey/<survey_id>/view', methods=['GET'])
 def view_survey(survey_id):
     try:
+        # Get email and username from query params
+        email = request.args.get("email")
+        username = request.args.get("username")
+
+        # Track click only if both values are present
+        if email and username:
+            db.collection("survey_clicks").add({
+                "email": email,
+                "username": username,
+                "survey_id": survey_id,
+                "clicked_at": datetime.utcnow()
+            })
+            print(f"Click tracked: {username} ({email}) on survey {survey_id}")
+
+        # Get the survey
         survey_ref = db.collection("surveys").document(survey_id)
         survey = survey_ref.get()
 
@@ -398,16 +403,18 @@ def view_survey(survey_id):
             return jsonify({"error": "Survey not found"}), 404
 
         survey_data = survey.to_dict()
+
+        # Get all responses for this survey
         responses_ref = db.collection("survey_responses").where("survey_id", "==", survey_id)
         responses = responses_ref.stream()
-
         response_list = [resp.to_dict() for resp in responses]
 
         return jsonify({"survey": survey_data, "responses": response_list})
 
     except Exception as e:
         print(f"Survey view error: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": "Something went wrong", "details": str(e)}), 500
+
 
 if __name__ == '__main__':
- app.run(debug=True)
+    app.run(debug=True)
