@@ -197,10 +197,15 @@ def track_survey_open():
             "opened_at": firestore.SERVER_TIMESTAMP,
             "submitted": False,
             "user_agent": request.headers.get('User-Agent', 'Unknown'),
-            "ip_address": request.remote_addr,
-            "email": email,
-            "username": username
+            "ip_address": request.remote_addr
         }
+        
+        # Store username and email if provided
+        if email:
+            tracking_data["email"] = email
+        if username:
+            tracking_data["username"] = username
+            
         db.collection("survey_tracking").document(tracking_id).set(tracking_data)
 
         return jsonify({"tracking_id": tracking_id, "message": "Survey opening tracked successfully"})
@@ -217,6 +222,11 @@ def get_survey(survey_id):
 
         if survey.exists:
             tracking_id = str(uuid.uuid4())
+            
+            # Extract username and email from query parameters if available
+            username = request.args.get('username')
+            email = request.args.get('email')
+            
             tracking_data = {
                 "survey_id": survey_id,
                 "tracking_id": tracking_id,
@@ -225,6 +235,13 @@ def get_survey(survey_id):
                 "user_agent": request.headers.get('User-Agent', 'Unknown'),
                 "ip_address": request.remote_addr
             }
+            
+            # Store username and email if provided in URL parameters
+            if email:
+                tracking_data["email"] = email
+            if username:
+                tracking_data["username"] = username
+                
             db.collection("survey_tracking").document(tracking_id).set(tracking_data)
 
             survey_data = survey.to_dict()
@@ -393,4 +410,4 @@ def view_survey(survey_id):
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+ app.run(debug=True)
