@@ -159,29 +159,19 @@ def submit_response():
             "id": response_id,
             "survey_id": survey_id,
             "responses": responses,
-            "submitted_at": firestore.SERVER_TIMESTAMP
+            "submitted_at": firestore.SERVER_TIMESTAMP,
+            "status": "pending"  # Mark as pending initially
         }
         if email:
             response_data["email"] = email
         if username:
             response_data["username"] = username
+        if tracking_id:
+            response_data["tracking_id"] = tracking_id
 
         db.collection("survey_responses").document(response_id).set(response_data)
-        forward_success = forward_survey_data_to_partners(response_data)
-        if not forward_success:
-            print("Survey forwarding failed (SurveyTitans)")
 
-
-        if tracking_id:
-            tracking_ref = db.collection("survey_tracking").document(tracking_id)
-            if tracking_ref.get().exists:
-                tracking_ref.update({
-                    "submitted": True,
-                    "submitted_at": firestore.SERVER_TIMESTAMP,
-                    "response_id": response_id
-                })
-
-        return jsonify({"message": "Response submitted successfully", "response_id": response_id})
+        return jsonify({"message": "Response submitted and pending verification", "response_id": response_id})
 
     except Exception as e:
         print(f"Response submission error: {e}")
