@@ -1,15 +1,9 @@
 from flask import Blueprint, request, jsonify
 import requests
-import firebase_admin
-from firebase_admin import credentials, firestore
-
-# Use your Firebase service account key file
-cred = credentials.Certificate(json.loads(cred_json))
-firebase_admin.initialize_app(cred)
-
+from firebase_admin import firestore
 
 postback_bp = Blueprint('postback_bp', __name__)
-db = firestore.client()
+db = firestore.client()  # Use existing Firebase app
 
 @postback_bp.route('/postback-handler', methods=['GET'])
 def handle_postback():
@@ -28,8 +22,11 @@ def handle_postback():
     print("✅ Postback received from PepeLeads")
 
     try:
-        # Find the pending survey response
-        responses_ref = db.collection("survey_responses").where("tracking_id", "==", sid1).where("status", "==", "pending").limit(1)
+        responses_ref = db.collection("survey_responses") \
+            .where("tracking_id", "==", sid1) \
+            .where("status", "==", "pending") \
+            .limit(1)
+
         results = list(responses_ref.stream())
 
         if not results:
@@ -38,7 +35,6 @@ def handle_postback():
         response_doc = results[0]
         response_data = response_doc.to_dict()
 
-        # Forward to SurveyTitans
         surveytitans_url = "https://surveytitans.com/track"
         payload = {
             "sid": sid1,
@@ -49,7 +45,6 @@ def handle_postback():
         res = requests.post(surveytitans_url, json=payload)
         print(f"SurveyTitans response: {res.status_code}")
 
-        # Update status to confirmed
         response_doc.reference.update({"status": "confirmed"})
 
         return "Survey forwarded to SurveyTitans", 200
