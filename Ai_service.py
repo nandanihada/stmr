@@ -1,5 +1,3 @@
-
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import google.generativeai as genai
@@ -20,25 +18,30 @@ BASE_URL = "https://pepperadsresponses.web.app"
 
 app = Flask(__name__)
 CORS(app)
-app.register_blueprint(postback_bp)
-
 
 # Gemini API Configuration
 genai.configure(api_key="AIzaSyAxEoutxU_w1OamJUe4FMOzr5ZdUyz8R4k")
 model = genai.GenerativeModel("gemini-1.5-flash-latest")
 
-# Firebase Setup
+# Firebase Setup - Initialize only once
+db = None
 try:
-    cred_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
-    if not cred_json:
-        raise Exception("GOOGLE_APPLICATION_CREDENTIALS_JSON env var is missing or empty.")
-    cred = credentials.Certificate(json.loads(cred_json))
-    firebase_admin.initialize_app(cred)
+    # Check if Firebase is already initialized
+    if not firebase_admin._apps:
+        cred_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON")
+        if not cred_json:
+            raise Exception("GOOGLE_APPLICATION_CREDENTIALS_JSON env var is missing or empty.")
+        cred = credentials.Certificate(json.loads(cred_json))
+        firebase_admin.initialize_app(cred)
+    
     db = firestore.client()
     print("Firebase connected successfully")
 except Exception as e:
     print(f"Firebase initialization error: {e}")
     db = None
+
+# Register blueprint after Firebase initialization
+app.register_blueprint(postback_bp)
 
 @app.route('/')
 def index():
@@ -369,9 +372,6 @@ def get_survey_tracking(survey_id):
         print(f"Survey tracking stats error: {e}")
         return jsonify({"error": str(e)}), 500
 
-from datetime import datetime
-from flask import request, jsonify
-
 @app.route('/survey/<survey_id>/view', methods=['GET'])
 def view_survey(survey_id):
     try: 
@@ -408,6 +408,7 @@ def view_survey(survey_id):
     except Exception as e:
         print(f"Survey view error: {e}")
         return jsonify({"error": "Something went wrong", "details": str(e)}), 500
+
 @app.route('/surveys', methods=['GET'])
 def list_surveys():
     try:

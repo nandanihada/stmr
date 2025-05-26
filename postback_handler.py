@@ -5,22 +5,12 @@ import requests
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-# Load Firebase credentials
-cred_json = os.environ.get("FIREBASE_CREDENTIALS")
-
-# Initialize Firebase only once
-if not firebase_admin._apps:
-    if cred_json:
-        cred = credentials.Certificate(json.loads(cred_json))
-    else:
-        # Local fallback: Use file path
-        with open("firebase_key.json") as f:
-            cred = credentials.Certificate(json.load(f))
-    firebase_admin.initialize_app(cred)
-
-# Now safe to get Firestore client
-db = firestore.client()
+# Create blueprint
 postback_bp = Blueprint('postback_bp', __name__)
+
+# Get Firestore client (Firebase should already be initialized in main app)
+def get_db():
+    return firestore.client()
 
 @postback_bp.route('/postback-handler', methods=['GET'])
 def handle_postback():
@@ -39,6 +29,7 @@ def handle_postback():
     print("✅ Postback received from PepeLeads")
 
     try:
+        db = get_db()
         responses_ref = db.collection("survey_responses") \
             .where("tracking_id", "==", sid1) \
             .where("status", "==", "pending") \
