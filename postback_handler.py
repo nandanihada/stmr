@@ -1,6 +1,12 @@
 from flask import Blueprint, request, jsonify
 import requests
-from firebase_admin import firestore
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# Use your Firebase service account key file
+cred = credentials.Certificate(json.loads(cred_json))
+firebase_admin.initialize_app(cred)
+
 
 postback_bp = Blueprint('postback_bp', __name__)
 db = firestore.client()
