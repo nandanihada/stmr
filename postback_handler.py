@@ -1,9 +1,26 @@
+import os
+import json
 from flask import Blueprint, request, jsonify
 import requests
-from firebase_admin import firestore
+import firebase_admin
+from firebase_admin import credentials, firestore
 
+# Load Firebase credentials
+cred_json = os.environ.get("FIREBASE_CREDENTIALS")
+
+# Initialize Firebase only once
+if not firebase_admin._apps:
+    if cred_json:
+        cred = credentials.Certificate(json.loads(cred_json))
+    else:
+        # Local fallback: Use file path
+        with open("firebase_key.json") as f:
+            cred = credentials.Certificate(json.load(f))
+    firebase_admin.initialize_app(cred)
+
+# Now safe to get Firestore client
+db = firestore.client()
 postback_bp = Blueprint('postback_bp', __name__)
-db = firestore.client()  # Use existing Firebase app
 
 @postback_bp.route('/postback-handler', methods=['GET'])
 def handle_postback():
