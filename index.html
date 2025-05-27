@@ -255,7 +255,7 @@
 
         <script>
             // Configuration
-            const SERVER_URL = "https://survey-ai-033z.onrender.com";
+            const SERVER_URL = "https://stmr.onrender.com";
             let currentSurveyId = null;
             let currentSurveyData = null;
 
@@ -277,7 +277,7 @@
             const surveyShareLink = document.getElementById("surveyShareLink");
             const copyLinkBtn = document.getElementById("copyLinkBtn");
             //   postback
-            const postbackBase = 'https://survey-ai-033z.onrender.com/postback-handler';
+            const postbackBase = 'https://stmr.onrender.com/postback-handler';
             const subidInput = document.getElementById('subidInput');
             const postbackResult = document.getElementById('postbackResult');
             const generatePostbackBtn = document.getElementById('generatePostbackBtn');
@@ -395,7 +395,7 @@
                         email: email || "",
                     });
 
-                    surveyShareLink.value = `https://pepperadsresponses.web.app/public_survey.html?${queryParams.toString()}`;
+                    surveyShareLink.value = `https://https://stmr-80d7b.web.app/public_survey.html?${queryParams.toString()}`;
                 } catch (error) {
                     displayErrorToast(`Survey Generation Failed: ${error.message}`);
                     console.error(error);
