@@ -106,6 +106,7 @@ def generate_survey():
     data = request.json
     prompt = data.get("prompt", "")
     response_type = data.get("response_type", "multiple_choice")
+    merge_with_pepperads = data.get("merge_with_pepperads", False)
 
     if not prompt:
         return jsonify({"error": "Prompt is required"}), 400
@@ -131,10 +132,26 @@ def generate_survey():
             "created_at": firestore.SERVER_TIMESTAMP,
             "shareable_link": f"{BASE_URL}/survey/{survey_id}/respond"
         }
+        
+        #Meerging with postback handler
+        
 
-        db.collection("surveys").document(survey_id).set(survey_data)
+        if merge_with_pepperads:
+            pepperads_link = f"https://pepperads.com/delivery?link={BASE_URL}/survey/{survey_id}/respond"
+            survey_data["pepperads_merged_link"] = pepperads_link
 
-        return jsonify({"survey_id": survey_id, "questions": questions})
+            db.collection("surveys").document(survey_id).set(survey_data)
+
+        response_json = {
+                "survey_id": survey_id,
+                "questions": questions,
+                "shareable_link": survey_data["shareable_link"]
+                        }
+
+        if merge_with_pepperads:
+            response_json["pepperads_merged_link"] = survey_data["pepperads_merged_link"]
+
+        return jsonify(response_json)
 
     except Exception as e:
         print(f"Survey generation error: {e}")
