@@ -17,7 +17,7 @@ from postback_handler import postback_bp
 BASE_URL = "https://stmr-80d7b.web.app"
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=["https://stmr-80d7b.web.app"])
 
 # Gemini API Configuration
 genai.configure(api_key="AIzaSyAxEoutxU_w1OamJUe4FMOzr5ZdUyz8R4k")
