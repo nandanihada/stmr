@@ -253,15 +253,15 @@
 
           surveyResponseForm.style.display = "none";
           thankYouMessage.style.display = "block";
-          viewResultsLink.href = `https://https://stmr-80d7b.web.app/index.html?id=${surveyId}#responses`;
+          viewResultsLink.href = `https://stmr-80d7b.web.app/index.html?id=${surveyId}#responses`;
 
           // Redirect to PepeLeads postback URL after a short delay
-          setTimeout(() => {
-            const target = `https://pepeleads.com/offer?oid=cjxd&subid=${trackingId}`;
-            window.location.href = `loading.html?target=${encodeURIComponent(
-              target
-            )}`;
-          }, 1000);
+          // setTimeout(() => {
+          //   const target = `https://pepeleads.com/offer?oid=cjxd&subid=${trackingId}`;
+          //   window.location.href = `loading.html?target=${encodeURIComponent(
+          //     target
+          //   )}`;
+          // }, 1000);
         } catch (error) {
           displayError(`Submission failed: ${error.message}`);
         } finally {
