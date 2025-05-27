@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "pepperadsresponses"
-  }
+    "default": "stmr-80d7b"
+  },
+  "targets": {},
+  "etags": {}
 }

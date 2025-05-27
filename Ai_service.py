@@ -14,7 +14,7 @@ from postback_handler import postback_bp
 
 
 
-BASE_URL = "https://pepperadsresponses.web.app"
+BASE_URL = "https://stmr-80d7b.web.app"
 
 app = Flask(__name__)
 CORS(app)

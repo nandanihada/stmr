@@ -8,7 +8,7 @@ from firebase_admin import credentials, firestore
 # Create blueprint
 postback_bp = Blueprint('postback_bp', __name__)
 
-# Get Firestore client (Firebase should already be initialized in main app)
+
 def get_db():
     return firestore.client()
 
@@ -19,6 +19,8 @@ def handle_postback():
     reward = request.args.get("reward")
     currency = request.args.get("currency")
     sid1 = request.args.get("sid1")
+    clicked_at = request.args.get("clicked_at")
+    username = request.args.get("username")
 
     if not all([transaction_id, status, reward, currency, sid1]):
         return "Missing required parameters", 400
